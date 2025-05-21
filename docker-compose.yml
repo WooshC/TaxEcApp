@@ -1,0 +1,28 @@
+﻿version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_ec
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "TuPassword123!"
+      MSSQL_PID: "Express"
+      TZ: "America/Guayaquil"
+      LANG: es_EC.UTF-8
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+      - ./init-db:/init-db
+    command: >
+      /bin/bash -c "
+        /opt/mssql/bin/sqlservr &
+        sleep 20 &&
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'TuPassword123!' -i /init-db/init.sql &&
+        tail -f /dev/null
+      "
+    restart: always
+
+volumes:
+  sql_data:
