@@ -24,11 +24,15 @@ services:
       - ./init:/init
     entrypoint: >
       bash -c "
-        echo 'Esperando a SQL Server...';
-        sleep 20;
+        echo 'Esperando a que SQL Server esté listo…';
+        until /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'TuPassword123!' -Q 'SELECT 1' &> /dev/null
+        do
+          echo '  aún no responde, reintentando en 5s…';
+          sleep 5;
+        done;
+        echo 'Conexión establecida. Ejecutando init.sql…';
         /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'TuPassword123!' -i /init/init.sql;
         echo 'Script ejecutado con éxito.'"
-
     networks:
       - sqlnet
 
