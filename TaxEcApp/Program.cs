@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configura la conexión a la base de datos (usa el nombre correcto del appsettings.json)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TaxDbConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 

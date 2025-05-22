@@ -3,26 +3,37 @@
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver_ec
+    container_name: sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "TuPassword123!"
-      MSSQL_PID: "Express"
-      TZ: "America/Guayaquil"
-      LANG: es_EC.UTF-8
+      MSSQL_SA_PASSWORD: "TuPassword123!"
+      MSSQL_PID: "Developer"
     ports:
-      - "1433:1433"
+      - "14333:1433"
     volumes:
-      - sql_data:/var/opt/mssql
-      - ./init-db:/init-db
-    command: >
-      /bin/bash -c "
-        /opt/mssql/bin/sqlservr &
-        sleep 20 &&
-        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'TuPassword123!' -i /init-db/init.sql &&
-        tail -f /dev/null
-      "
-    restart: always
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - sqlnet
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: db-init
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./init:/init
+    entrypoint: >
+      bash -c "
+        echo 'Esperando a SQL Server...';
+        sleep 20;
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'TuPassword123!' -i /init/init.sql;
+        echo 'Script ejecutado con éxito.'"
+
+    networks:
+      - sqlnet
 
 volumes:
-  sql_data:
+  sqlserverdata:
+
+networks:
+  sqlnet:

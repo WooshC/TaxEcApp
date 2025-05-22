@@ -1,4 +1,7 @@
-﻿IF DB_ID('BDD_TAXEC') IS NULL
+﻿USE master;
+GO
+
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'BDD_TAXEC')
 BEGIN
     CREATE DATABASE BDD_TAXEC;
 END
@@ -6,7 +9,6 @@ GO
 
 USE BDD_TAXEC;
 GO
-
 
 CREATE TABLE Contribuyentes (
     ContribuyenteID INT IDENTITY(1,1) PRIMARY KEY,
